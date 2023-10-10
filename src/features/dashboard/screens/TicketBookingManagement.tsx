@@ -2,7 +2,10 @@ import { Box, Typography } from "@mui/material";
 import React from "react";
 import DataTable, { HeadCell } from "../../../components/DataTable";
 import { useAppDispatch } from "../../../hooks";
-import { setShowBookingModel } from "../../../store/slices/bookingSlice";
+import {
+  setSelectedField,
+  setShowBookingModel,
+} from "../../../store/slices/bookingSlice";
 import BookingModal from "../modals/BookingModal";
 import { Reservation } from "../../../types/booking.types";
 
@@ -88,7 +91,8 @@ const TicketBookingManagement = (props: Props) => {
     console.log("Delete");
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    await dispatch(setSelectedField(null));
     dispatch(setShowBookingModel(true));
   };
 

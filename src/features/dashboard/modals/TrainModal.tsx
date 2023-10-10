@@ -12,17 +12,75 @@ import { useAppDispatch, useAppSelector } from "../../../hooks";
 import { setShowTrainModel } from "../../../store/slices/trainSlice";
 import { orange } from "@mui/material/colors";
 import { Option, Select, Switch, Typography } from "@mui/joy";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { MobileTimePicker } from "@mui/x-date-pickers/MobileTimePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { Train } from "../../../types/train.types";
 
 const TrainModal = () => {
   const dispatch = useAppDispatch();
-  const [checked, setChecked] = React.useState<boolean>(false);
   const { selectedField, isShowTrainModal } = useAppSelector(
     (state) => state.train
   );
+
+  const initialFormData = React.useMemo(() => {
+    const currentTime = dayjs();
+    const currentTimeFormatted = currentTime.format("hh:mm A");
+    const tenMinutesLater = currentTime.add(10, "minutes");
+    const tenMinutesLaterString = tenMinutesLater.format("HH:mm A");
+
+    return {
+      id: "",
+      trainName: "",
+      seatCount: 0,
+      from: "",
+      to: "",
+      availableDays: "",
+      arrivalTime: currentTimeFormatted,
+      departureTime: tenMinutesLaterString,
+      isPublish: false,
+    };
+  }, []);
+
+  const [formData, setFormData] = React.useState<Train>(initialFormData);
+
+  const resetFormData = React.useCallback(() => {
+    setFormData(initialFormData);
+  }, [initialFormData]);
+
+  React.useEffect(() => {
+    if (selectedField) {
+      setFormData({
+        id: selectedField.id,
+        trainName: selectedField.trainName,
+        seatCount: selectedField.seatCount,
+        from: selectedField.from,
+        to: selectedField.to,
+        availableDays: selectedField.availableDays,
+        arrivalTime: selectedField.arrivalTime,
+        departureTime: selectedField.departureTime,
+        isPublish: selectedField.isPublish,
+      });
+    } else {
+      resetFormData();
+    }
+  }, [resetFormData, selectedField]);
+
+  const handleChangeAvailableDays = (
+    event: React.SyntheticEvent | null,
+    newValue: string | null
+  ) => {
+    setFormData({ ...formData, availableDays: newValue ?? "weekdays" });
+  };
+
+  const handleArrivalTimeChange = (newTime: Dayjs | null) => {
+    setFormData({ ...formData, arrivalTime: newTime as unknown as string });
+  };
+
+  const handleDepartureTimeChange = (newTime: Dayjs | null) => {
+    setFormData({ ...formData, departureTime: newTime as unknown as string });
+  };
 
   return (
     <>
@@ -48,23 +106,56 @@ const TrainModal = () => {
             <Stack spacing={1}>
               <FormControl>
                 <FormLabel>Train Name</FormLabel>
-                <Input autoFocus required />
+                <Input
+                  autoFocus
+                  required
+                  value={formData.trainName}
+                  onChange={(e) =>
+                    setFormData({ ...formData, trainName: e.target.value })
+                  }
+                />
               </FormControl>
               <FormControl>
                 <FormLabel>Seat Count</FormLabel>
-                <Input required type="number" />
+                <Input
+                  required
+                  type="number"
+                  value={formData.seatCount}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      seatCount: parseInt(e.target.value, 10),
+                    })
+                  }
+                />
               </FormControl>
               <FormControl>
                 <FormLabel>From</FormLabel>
-                <Input required />
+                <Input
+                  required
+                  value={formData.from}
+                  onChange={(e) =>
+                    setFormData({ ...formData, from: e.target.value })
+                  }
+                />
               </FormControl>
               <FormControl>
                 <FormLabel>To</FormLabel>
-                <Input required />
+                <Input
+                  required
+                  value={formData.to}
+                  onChange={(e) =>
+                    setFormData({ ...formData, to: e.target.value })
+                  }
+                />
               </FormControl>
               <FormControl>
                 <FormLabel>Available On</FormLabel>
-                <Select defaultValue="weekday">
+                <Select
+                  defaultValue="weekday"
+                  value={formData.availableDays}
+                  onChange={handleChangeAvailableDays}
+                >
                   <Option value="weekend">Weekend</Option>
                   <Option value="weekday">WeekDay</Option>
                   <Option value="allDays">All Day</Option>
@@ -85,7 +176,9 @@ const TrainModal = () => {
                   <FormLabel>Arrival Time</FormLabel>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <MobileTimePicker
+                      value={dayjs(formData.arrivalTime, "hh:mm A")}
                       defaultValue={dayjs("2022-04-17T15:30")}
+                      onChange={handleArrivalTimeChange}
                       slotProps={{ textField: { size: "small" } }}
                       sx={{
                         borderRadius: 6,
@@ -99,7 +192,9 @@ const TrainModal = () => {
                   <FormLabel>Departure Time</FormLabel>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <MobileTimePicker
+                      value={dayjs(formData.departureTime, "hh:mm A")}
                       defaultValue={dayjs("2022-04-17T15:30")}
+                      onChange={handleDepartureTimeChange}
                       slotProps={{
                         textField: {
                           size: "small",
@@ -133,12 +228,15 @@ const TrainModal = () => {
                     Train Availability
                   </Typography>
                   <Switch
-                    checked={checked}
+                    checked={formData.isPublish}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                      setChecked(event.target.checked)
+                      setFormData({
+                        ...formData,
+                        isPublish: event.target.checked,
+                      })
                     }
-                    color={checked ? "success" : "neutral"}
-                    variant={checked ? "solid" : "outlined"}
+                    color={formData.isPublish ? "success" : "neutral"}
+                    variant={formData.isPublish ? "solid" : "outlined"}
                     startDecorator={
                       <Typography
                         sx={{
@@ -146,7 +244,7 @@ const TrainModal = () => {
                           fontStyle: "italic",
                         }}
                       >
-                        {checked ? "available" : " not available"}
+                        {formData.isPublish ? "available" : " not available"}
                       </Typography>
                     }
                     slotProps={{

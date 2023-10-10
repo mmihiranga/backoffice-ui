@@ -11,6 +11,7 @@ export interface Train {
   seatCount: number;
   from: string;
   to: string;
+  availableDays: string;
   arrivalTime: string;
   departureTime: string;
   isPublish: boolean;

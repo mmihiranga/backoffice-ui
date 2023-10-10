@@ -3,7 +3,10 @@ import React from "react";
 import DataTable, { HeadCell } from "../../../components/DataTable";
 import { useAppDispatch } from "../../../hooks";
 import { Train } from "../../../types/train.types";
-import { setShowTrainModel } from "../../../store/slices/trainSlice";
+import {
+  setSelectedField,
+  setShowTrainModel,
+} from "../../../store/slices/trainSlice";
 import AddTrainModal from "../modals/TrainModal";
 
 const TrainManagement = () => {
@@ -42,6 +45,12 @@ const TrainManagement = () => {
       label: "To",
     },
     {
+      id: "availableDays",
+      numeric: true,
+      disablePadding: false,
+      label: "Available On",
+    },
+    {
       id: "arrivalTime",
       numeric: true,
       disablePadding: false,
@@ -68,6 +77,7 @@ const TrainManagement = () => {
       500,
       "Matara",
       "Coloumbo",
+      "weekday",
       "06.00AM",
       "09.30AM",
       true
@@ -78,6 +88,7 @@ const TrainManagement = () => {
       500,
       "Matara",
       "Coloumbo",
+      "weekday",
       "07.00AM",
       "11.30AM",
       true
@@ -90,6 +101,7 @@ const TrainManagement = () => {
     seatCount: number,
     from: string,
     to: string,
+    availableDays: string,
     arrivalTime: string,
     departureTime: string,
     isPublish: boolean
@@ -100,6 +112,7 @@ const TrainManagement = () => {
       seatCount,
       from,
       to,
+      availableDays,
       arrivalTime,
       departureTime,
       isPublish,
@@ -107,14 +120,22 @@ const TrainManagement = () => {
   }
 
   const handleEdit = (value: string) => {
-    dispatch(setShowTrainModel(true));
+    const selectedTrain = rows.find((user) => user.trainName === value);
+
+    if (selectedTrain) {
+      dispatch(setSelectedField(selectedTrain));
+      dispatch(setShowTrainModel(true));
+    } else {
+      alert("Train not found");
+    }
   };
 
   const handleDelete = () => {
     console.log("Delete");
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    await dispatch(setSelectedField(null));
     dispatch(setShowTrainModel(true));
   };
 

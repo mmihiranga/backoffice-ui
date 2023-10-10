@@ -3,7 +3,11 @@ import React from "react";
 import DataTable, { HeadCell } from "../../../components/DataTable";
 import { useAppDispatch } from "../../../hooks";
 import { User } from "../../../types/user.types";
-import { setShowUserModel, setUserType } from "../../../store/slices/userSlice";
+import {
+  setSelectedField,
+  setShowUserModel,
+  setUserType,
+} from "../../../store/slices/userSlice";
 import UserModal from "../modals/UserModal";
 
 const TravelAgentManagement = () => {
@@ -105,16 +109,24 @@ const TravelAgentManagement = () => {
   }
 
   const handleEdit = (value: string) => {
-    dispatch(setUserType("Agent"));
-    dispatch(setShowUserModel(true));
+    const selectedUser = rows.find((user) => user.name === value);
+
+    if (selectedUser) {
+      dispatch(setSelectedField(selectedUser));
+      dispatch(setUserType("Agent"));
+      dispatch(setShowUserModel(true));
+    } else {
+      console.error(`User with value ${value} not found.`);
+    }
   };
 
   const handleDelete = () => {
     console.log("Delete");
   };
 
-  const handleSubmit = () => {
-    dispatch(setUserType("Agent"));
+  const handleSubmit = async () => {
+    await dispatch(setSelectedField(null));
+    await dispatch(setUserType("Agent"));
     dispatch(setShowUserModel(true));
   };
 

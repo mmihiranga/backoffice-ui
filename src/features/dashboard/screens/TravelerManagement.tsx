@@ -113,9 +113,10 @@ const TravelerManagement = () => {
 
     if (selectedUser) {
       dispatch(setSelectedField(selectedUser));
+      dispatch(setUserType("Traveler"));
       dispatch(setShowUserModel(true));
     } else {
-      console.error(`User with value ${value} not found.`);
+      alert(`User not found.`);
     }
   };
 

@@ -16,8 +16,7 @@ interface EnhancedTableProps<T> {
 }
 
 export function EnhancedTableHead<T>(props: EnhancedTableProps<T>) {
-  const { headCells, order, orderBy, numSelected, rowCount, onRequestSort } =
-    props;
+  const { headCells, order, orderBy, onRequestSort } = props;
   const createSortHandler =
     (property: keyof T) => (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, property);

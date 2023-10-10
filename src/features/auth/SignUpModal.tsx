@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as React from "react";
 import Button from "@mui/joy/Button";
 import Stack from "@mui/joy/Stack";
@@ -9,8 +10,6 @@ import DialogContent from "@mui/joy/DialogContent";
 import FormControl from "@mui/joy/FormControl";
 import FormLabel from "@mui/joy/FormLabel";
 import Input from "@mui/joy/Input";
-import Add from "@mui/icons-material/Add";
-import { grey } from "@mui/material/colors";
 import { Typography } from "@mui/joy";
 
 const SignUpModal = () => {

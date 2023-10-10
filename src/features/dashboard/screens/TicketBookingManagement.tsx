@@ -23,68 +23,105 @@ const TicketBookingManagement = (props: Props) => {
       label: "Booking ID",
     },
     {
-      id: "travelerId",
+      id: "referenceId",
       numeric: true,
       disablePadding: false,
-      label: "Travel Agent ID",
+      label: "Reference ID",
     },
     {
       id: "userId",
       numeric: true,
       disablePadding: false,
-      label: "NIC",
+      label: "Reserved For",
     },
     {
-      id: "userName",
-      numeric: true,
-      disablePadding: false,
-      label: "User Name",
-    },
-    {
-      id: "trainId",
-      numeric: true,
-      disablePadding: false,
-      label: "Train Number",
-    },
-    {
-      id: "date",
+      id: "reservationDate",
       numeric: true,
       disablePadding: true,
       label: "Reservation Date",
+    },
+    {
+      id: "reservedDate",
+      numeric: true,
+      disablePadding: true,
+      label: "Reserved Date",
+    },
+    {
+      id: "from",
+      numeric: true,
+      disablePadding: true,
+      label: "From",
+    },
+    {
+      id: "to",
+      numeric: true,
+      disablePadding: true,
+      label: "To",
+    },
+    {
+      id: "arrivalTime",
+      numeric: true,
+      disablePadding: true,
+      label: "Arrival Time",
+    },
+    {
+      id: "departureTime",
+      numeric: true,
+      disablePadding: true,
+      label: "Departure Time",
     },
   ];
 
   const rows: Reservation[] = [
     createData(
-      "B305",
-      "TV305",
-      "TU234234",
-      "Madhura Mihiranga",
-      "TS451",
-      "12/02/2031"
+      "BK-323232305",
+      "TR-3025",
+      "AGENT_234234",
+      "154845151V",
+      "12/10/2023",
+      "12/11/2023",
+      "Matara",
+      "Coloumbo",
+      "07.00AM",
+      "11.30AM"
     ),
   ];
 
   function createData(
     id: string,
-    travelerId: string,
-    userId: string,
-    userName: string,
     trainId: string,
-    date: string
+    referenceId: string,
+    userId: string,
+    reservationDate: string,
+    reservedDate: string,
+    from: string,
+    to: string,
+    arrivalTime: string,
+    departureTime: string
   ): Reservation {
     return {
       id,
-      travelerId,
-      userId,
-      userName,
       trainId,
-      date,
+      referenceId,
+      userId,
+      reservationDate,
+      reservedDate,
+      from,
+      to,
+      arrivalTime,
+      departureTime,
     };
   }
 
   const handleEdit = (value: string) => {
-    dispatch(setShowBookingModel(true));
+    const selectedReservation = rows.find((user) => user.id === value);
+
+    if (selectedReservation) {
+      dispatch(setSelectedField(selectedReservation));
+      dispatch(setShowBookingModel(true));
+    } else {
+      alert("Booking not found");
+    }
   };
 
   const handleDelete = () => {
@@ -120,7 +157,7 @@ const TicketBookingManagement = (props: Props) => {
         onClickAdd={handleSubmit}
         onClickDelete={handleDelete}
         onClickEdit={handleEdit}
-        type={"userId"}
+        type={"id"}
       />
       <BookingModal />
     </Box>

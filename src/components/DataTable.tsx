@@ -19,7 +19,7 @@ import {
   stableSort,
 } from "./DataTable/DataTableFunctions";
 import { EnhancedTableToolbar } from "./DataTable/EnhancedTableToolbar";
-import { EnhancedTableHead } from "./DataTable/EnhancedTableProps";
+import { EnhancedTableHead } from "./DataTable/EnhancedTableHead";
 
 type DataTableProps<T extends Record<keyof T, string | number | boolean>> = {
   headers: HeadCell<T>[];
@@ -104,188 +104,197 @@ function DataTable<T extends Record<keyof T, string | number | boolean>>(
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - props.rows.length) : 0;
 
   return (
-    <Sheet
-      variant="outlined"
-      sx={{
-        width: "100%",
-        boxShadow: "sm",
-        borderRadius: "sm",
-        // flexGrow: 1,
-        boxSizing: "border-box",
-        overflow: "auto",
-      }}
-    >
-      <EnhancedTableToolbar
-        numSelected={selected.length}
-        title={props.title}
-        addButtonTitle={props.addButtonTitle}
-        onclickEdit={props.onClickEdit}
-        onclickDelete={props.onClickDelete}
-        onclickAdd={props.onClickAdd}
-        selectedItem={selected[0]}
-      />
-      <Table
-        aria-labelledby="tableTitle"
-        stickyHeader
-        stickyFooter
+    <Box sx={{ width: "100%" }}>
+      <Sheet
+        variant="outlined"
         sx={{
-          "--TableCell-selectedBackground": (theme) =>
-            theme.vars.palette.success.softBg,
-          "& thead th:nth-child(1)": {
-            width: "40px",
-          },
-          "& thead th:nth-child(2)": {
-            width: "15%",
-          },
-          "& tr > *:nth-child(n+3)": { textAlign: "right" },
+          boxShadow: "sm",
+          borderRadius: "sm",
+          // flexGrow: 1,
+          boxSizing: "border-box",
+          overflow: "auto",
+          backgroundSize:
+            "40px calc(100% - var(--TableCell-height)), 40px calc(100% - var(--TableCell-height)), 14px calc(100% - var(--TableCell-height)), 14px calc(100% - var(--TableCell-height))",
+          backgroundAttachment: " scroll",
+          backgroundPosition:
+            "var(--Table-firstColumnWidth) var(--TableCell-height), calc(100% - var(--Table-lastColumnWidth)) var(--TableCell-height), var(--Table-firstColumnWidth) var(--TableCell-height), calc(100% - var(--Table-lastColumnWidth)) var(--TableCell-height)",
         }}
       >
-        <EnhancedTableHead<T>
-          headCells={props.headers}
+        <EnhancedTableToolbar
           numSelected={selected.length}
-          order={order}
-          orderBy={orderBy as string}
-          onRequestSort={handleRequestSort}
-          rowCount={props.rows.length}
+          title={props.title}
+          addButtonTitle={props.addButtonTitle}
+          onclickEdit={props.onClickEdit}
+          onclickDelete={props.onClickDelete}
+          onclickAdd={props.onClickAdd}
+          selectedItem={selected[0]}
         />
-        <tbody>
-          {stableSort<T>(
-            props.rows,
-            getComparator(order, orderBy as ValidKeyOfT<T>)
-          )
-            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            .map((row, index) => {
-              const isItemSelected = isSelected(
-                row[props.type as keyof T] as string
-              );
-              const labelId = `enhanced-table-checkbox-${index}`;
+        <Table
+          aria-labelledby="tableTitle"
+          stickyHeader
+          stickyFooter
+          sx={{
+            boxSizing: "border-box",
+            "--TableCell-selectedBackground": (theme) =>
+              theme.vars.palette.success.softBg,
+            "& thead th:nth-child(1)": {
+              width: "40px",
+            },
+            "& thead th:nth-child(2)": {
+              width: "10%",
+            },
+            "& tr > *:nth-child(n+3)": { textAlign: "right" },
+          }}
+        >
+          <EnhancedTableHead<T>
+            headCells={props.headers}
+            numSelected={selected.length}
+            order={order}
+            orderBy={orderBy as string}
+            onRequestSort={handleRequestSort}
+            rowCount={props.rows.length}
+          />
+          <tbody>
+            {stableSort<T>(
+              props.rows,
+              getComparator(order, orderBy as ValidKeyOfT<T>)
+            )
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((row, index) => {
+                const isItemSelected = isSelected(
+                  row[props.type as keyof T] as string
+                );
+                const labelId = `enhanced-table-checkbox-${index}`;
 
-              return (
-                <tr
-                  onClick={(event) =>
-                    handleClick(event, row[props.type as keyof T] as string)
-                  }
-                  role="checkbox"
-                  aria-checked={isItemSelected}
-                  tabIndex={-1}
-                  key={row[props.type as keyof T] as string}
-                  // selected={isItemSelected}
-                  style={
-                    isItemSelected
-                      ? ({
-                          "--TableCell-dataBackground":
-                            "var(--TableCell-selectedBackground)",
-                          "--TableCell-headBackground":
-                            "var(--TableCell-selectedBackground)",
-                        } as React.CSSProperties)
-                      : {}
-                  }
-                >
-                  <th scope="row">
-                    <Checkbox
-                      checked={isItemSelected}
-                      slotProps={{
-                        input: {
-                          "aria-labelledby": labelId,
-                        },
-                      }}
-                      sx={{ verticalAlign: "top" }}
-                    />
-                  </th>
-                  {props.headers.map((headCell) => {
-                    const cellValue = row[headCell.id as keyof T];
-                    return (
-                      <td key={headCell.id as string}>
-                        {typeof cellValue === "boolean"
-                          ? cellValue
-                            ? props.statusTrueText ?? "Available"
-                            : props.statusFalseText ?? "No"
-                          : cellValue}
-                      </td>
-                    );
-                  })}
-                </tr>
-              );
-            })}
-          {emptyRows > 0 && (
-            <tr
-              style={
-                {
-                  height: `calc(${emptyRows} * 40px)`,
-                  "--TableRow-hoverBackground": "transparent",
-                } as React.CSSProperties
-              }
-            >
-              <td colSpan={props.headers.length + 1} aria-hidden />
-            </tr>
-          )}
-        </tbody>
-        <tfoot>
-          <tr>
-            <td
-              colSpan={props.headers.length + 1}
-              style={{
-                background: "white",
-              }}
-            >
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 2,
-                  justifyContent: "flex-end",
+                return (
+                  <tr
+                    onClick={(event) =>
+                      handleClick(event, row[props.type as keyof T] as string)
+                    }
+                    role="checkbox"
+                    aria-checked={isItemSelected}
+                    tabIndex={-1}
+                    key={row[props.type as keyof T] as string}
+                    // selected={isItemSelected}
+                    style={
+                      isItemSelected
+                        ? ({
+                            "--TableCell-dataBackground":
+                              "var(--TableCell-selectedBackground)",
+                            "--TableCell-headBackground":
+                              "var(--TableCell-selectedBackground)",
+                          } as React.CSSProperties)
+                        : {}
+                    }
+                  >
+                    <th scope="row">
+                      <Checkbox
+                        checked={isItemSelected}
+                        slotProps={{
+                          input: {
+                            "aria-labelledby": labelId,
+                          },
+                        }}
+                        sx={{ verticalAlign: "top" }}
+                      />
+                    </th>
+                    {props.headers.map((headCell) => {
+                      const cellValue = row[headCell.id as keyof T];
+                      return (
+                        <td key={headCell.id as string}>
+                          {typeof cellValue === "boolean"
+                            ? cellValue
+                              ? props.statusTrueText ?? "Available"
+                              : props.statusFalseText ?? "No"
+                            : cellValue}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+            {emptyRows > 0 && (
+              <tr
+                style={
+                  {
+                    height: `calc(${emptyRows} * 40px)`,
+                    "--TableRow-hoverBackground": "transparent",
+                  } as React.CSSProperties
+                }
+              >
+                <td colSpan={props.headers.length + 1} aria-hidden />
+              </tr>
+            )}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td
+                colSpan={props.headers.length + 1}
+                style={{
+                  background: "white",
                 }}
               >
-                <FormControl orientation="horizontal" size="sm">
-                  <FormLabel>Rows per page:</FormLabel>
-                  <Select
-                    onChange={handleChangeRowsPerPage}
-                    value={rowsPerPage}
-                  >
-                    <Option value={10}>10</Option>
-                    <Option value={15}>15</Option>
-                    <Option value={25}>25</Option>
-                  </Select>
-                </FormControl>
-                <Typography textAlign="center" sx={{ minWidth: 80 }}>
-                  {labelDisplayedRows({
-                    from: props.rows.length === 0 ? 0 : page * rowsPerPage + 1,
-                    to: getLabelDisplayedRowsTo(),
-                    count: props.rows.length === -1 ? -1 : props.rows.length,
-                  })}
-                </Typography>
-                <Box sx={{ display: "flex", gap: 1 }}>
-                  <IconButton
-                    size="sm"
-                    color="neutral"
-                    variant="outlined"
-                    disabled={page === 0}
-                    onClick={() => handleChangePage(page - 1)}
-                    sx={{ bgcolor: "background.surface" }}
-                  >
-                    <KeyboardArrowLeftIcon />
-                  </IconButton>
-                  <IconButton
-                    size="sm"
-                    color="neutral"
-                    variant="outlined"
-                    disabled={
-                      props.rows.length !== -1
-                        ? page >= Math.ceil(props.rows.length / rowsPerPage) - 1
-                        : false
-                    }
-                    onClick={() => handleChangePage(page + 1)}
-                    sx={{ bgcolor: "background.surface" }}
-                  >
-                    <KeyboardArrowRightIcon />
-                  </IconButton>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 2,
+                    justifyContent: "flex-end",
+                  }}
+                >
+                  <FormControl orientation="horizontal" size="sm">
+                    <FormLabel>Rows per page:</FormLabel>
+                    <Select
+                      onChange={handleChangeRowsPerPage}
+                      value={rowsPerPage}
+                    >
+                      <Option value={10}>10</Option>
+                      <Option value={15}>15</Option>
+                      <Option value={25}>25</Option>
+                    </Select>
+                  </FormControl>
+                  <Typography textAlign="center" sx={{ minWidth: 80 }}>
+                    {labelDisplayedRows({
+                      from:
+                        props.rows.length === 0 ? 0 : page * rowsPerPage + 1,
+                      to: getLabelDisplayedRowsTo(),
+                      count: props.rows.length === -1 ? -1 : props.rows.length,
+                    })}
+                  </Typography>
+                  <Box sx={{ display: "flex", gap: 1 }}>
+                    <IconButton
+                      size="sm"
+                      color="neutral"
+                      variant="outlined"
+                      disabled={page === 0}
+                      onClick={() => handleChangePage(page - 1)}
+                      sx={{ bgcolor: "background.surface" }}
+                    >
+                      <KeyboardArrowLeftIcon />
+                    </IconButton>
+                    <IconButton
+                      size="sm"
+                      color="neutral"
+                      variant="outlined"
+                      disabled={
+                        props.rows.length !== -1
+                          ? page >=
+                            Math.ceil(props.rows.length / rowsPerPage) - 1
+                          : false
+                      }
+                      onClick={() => handleChangePage(page + 1)}
+                      sx={{ bgcolor: "background.surface" }}
+                    >
+                      <KeyboardArrowRightIcon />
+                    </IconButton>
+                  </Box>
                 </Box>
-              </Box>
-            </td>
-          </tr>
-        </tfoot>
-      </Table>
-    </Sheet>
+              </td>
+            </tr>
+          </tfoot>
+        </Table>
+      </Sheet>
+    </Box>
   );
 }
 

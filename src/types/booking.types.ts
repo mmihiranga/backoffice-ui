@@ -7,9 +7,13 @@ export interface IBookingReduxState {
 
 export interface Reservation {
   id: string;
-  travelerId: string;
-  userId: string;
-  userName: string;
   trainId: string;
-  date: string;
+  referenceId: string;
+  userId: string;
+  reservationDate: string;
+  reservedDate: string;
+  from: string;
+  to: string;
+  arrivalTime: string;
+  departureTime: string;
 }

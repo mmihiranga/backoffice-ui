@@ -272,7 +272,7 @@ const TrainModal = () => {
                     : () => console.log("add")
                 }
               >
-                Submit
+                {selectedField ? "Update" : "Submit"}
               </Button>
             </Stack>
           </form>

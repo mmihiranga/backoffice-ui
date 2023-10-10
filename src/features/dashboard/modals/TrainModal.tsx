@@ -29,7 +29,6 @@ const TrainModal = () => {
     const currentTimeFormatted = currentTime.format("hh:mm A");
     const tenMinutesLater = currentTime.add(10, "minutes");
     const tenMinutesLaterString = tenMinutesLater.format("HH:mm A");
-
     return {
       id: "",
       trainName: "",

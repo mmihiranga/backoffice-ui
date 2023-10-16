@@ -10,7 +10,7 @@ interface EnhancedTableToolbarProps {
   addButtonTitle: string;
   onclickAdd: () => void;
   onclickEdit: (value: string) => void;
-  onclickDelete: () => void;
+  onclickDelete: (id: string) => void;
   selectedItem: string;
 }
 
@@ -68,7 +68,7 @@ export function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
               Update
             </Button>
           </Tooltip>
-          <DeleteItemModal onClickDelete={onclickDelete} />
+          <DeleteItemModal onClickDelete={() => onclickDelete(selectedItem)} />
         </Stack>
       ) : (
         <Tooltip title="Filter list">

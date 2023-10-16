@@ -16,6 +16,7 @@ import {
   setShowUserModel,
 } from "../../../store/slices/userSlice";
 import { User } from "../../../types/user.types";
+import Api from "../../../services/Api";
 
 const UserModal = () => {
   const dispatch = useAppDispatch();
@@ -61,6 +62,69 @@ const UserModal = () => {
       resetFormData();
     }
   }, [resetFormData, selectedField]);
+
+  const mapUserToUpdateData = (user: User) => {
+    return {
+      nic: user.id,
+      username: user.email,
+      password: user.password,
+      role: user.role,
+      contactNo: user.phoneNo,
+      name: user.name,
+      age: user.age,
+      address: user.address,
+      isActive: user.isActive,
+    };
+  };
+
+  const handleUpdate = async () => {
+    try {
+      if (selectedField) {
+        const response = await Api.put(
+          `/Users/updateUsers/${selectedField.id}`,
+          {
+            nic: selectedField.id,
+            username: selectedField.email,
+            password: selectedField.password,
+            role: selectedField.role,
+            contactNo: selectedField.phoneNo,
+            name: selectedField.name,
+            age: selectedField.age,
+            address: selectedField.address,
+            isActive: selectedField.isActive,
+          }
+        );
+        console.log("User updated successfully:", response.data);
+      }
+
+      console.log("User not found");
+    } catch (error) {
+      console.error("Error updating user:", error);
+    }
+  };
+
+  const handleCreate = async () => {
+    try {
+      if (selectedField) {
+        const response = await Api.post(`/Users/addUsers/`, {
+          nic: selectedField.id,
+          username: selectedField.email,
+          password: selectedField.password,
+          role: selectedField.role,
+          contactNo: selectedField.phoneNo,
+          name: selectedField.name,
+          age: selectedField.age,
+          address: selectedField.address,
+          isActive: selectedField.isActive,
+        });
+        console.log("User Create successfully:", response.data);
+      }
+
+      console.log("User not found");
+    } catch (error) {
+      console.error("Error Create user:", error);
+    }
+  };
 
   return (
     <>
@@ -210,9 +274,9 @@ const UserModal = () => {
                 }}
                 onClick={() => {
                   if (selectedField) {
-                    console.log("update", formData);
+                    handleUpdate();
                   } else {
-                    console.log("add", formData);
+                    handleCreate();
                   }
                   dispatch(setShowUserModel(false));
                   dispatch(setSelectedField(undefined));

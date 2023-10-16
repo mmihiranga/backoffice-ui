@@ -1,5 +1,5 @@
 import { Box, Typography } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import DataTable, { HeadCell } from "../../../components/DataTable";
 import { useAppDispatch } from "../../../hooks";
 import { User } from "../../../types/user.types";
@@ -9,10 +9,12 @@ import {
   setUserType,
 } from "../../../store/slices/userSlice";
 import UserModal from "../modals/UserModal";
+import Api from "../../../services/Api";
 
 const TravelerManagement = () => {
   const dispatch = useAppDispatch();
   const orderByKey: keyof User = "name";
+  const [rows, setRows] = React.useState<User[]>([]);
 
   const headCells: HeadCell<User>[] = [
     {
@@ -59,30 +61,30 @@ const TravelerManagement = () => {
     },
   ];
 
-  const rows: User[] = [
-    createData(
-      "2",
-      "Alice Smith",
-      "alice@example.com",
-      "25",
-      "456 Elm St",
-      "555-987-6543",
-      "securepassword",
-      true,
-      "Agent"
-    ),
-    createData(
-      "1",
-      "John Doe",
-      "john@example.com",
-      "30",
-      "123 Main St",
-      "555-123-4567",
-      "mypassword",
-      true,
-      "Admin"
-    ),
-  ];
+  // const rows: User[] = [
+  //   createData(
+  //     "2",
+  //     "Alice Smith",
+  //     "alice@example.com",
+  //     "25",
+  //     "456 Elm St",
+  //     "555-987-6543",
+  //     "securepassword",
+  //     true,
+  //     "Agent"
+  //   ),
+  //   createData(
+  //     "1",
+  //     "John Doe",
+  //     "john@example.com",
+  //     "30",
+  //     "123 Main St",
+  //     "555-123-4567",
+  //     "mypassword",
+  //     true,
+  //     "Admin"
+  //   ),
+  // ];
 
   function createData(
     id: string,
@@ -108,6 +110,38 @@ const TravelerManagement = () => {
     };
   }
 
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await Api.get("/Users/getUsers");
+        const users = response.data;
+
+        // Create a mapping function to transform the response data
+        const mapResponseToUser = (responseData: any) => {
+          return {
+            id: responseData.nic,
+            name: responseData.name,
+            email: responseData.username,
+            age: responseData.age,
+            address: responseData.address,
+            phoneNo: responseData.contactNo,
+            password: responseData.password,
+            isActive: responseData.isActive,
+            role: responseData.role,
+          };
+        };
+
+        const userRows = users.map(mapResponseToUser);
+
+        setRows(userRows);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
+    fetchData();
+  }, []);
+
   const handleEdit = (value: string) => {
     const selectedUser = rows.find((user) => user.name === value);
 
@@ -120,8 +154,13 @@ const TravelerManagement = () => {
     }
   };
 
-  const handleDelete = () => {
-    console.log("Delete");
+  const handleDelete = async (nic: string) => {
+    try {
+      const response = await Api.delete(`/Users/deleteUsers/${nic}`);
+      console.log("User deleted successfully:", response.data);
+    } catch (error) {
+      console.error("Error deleting user:", error);
+    }
   };
 
   const handleSubmit = async () => {

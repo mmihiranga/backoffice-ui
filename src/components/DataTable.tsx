@@ -29,7 +29,7 @@ type DataTableProps<T extends Record<keyof T, string | number | boolean>> = {
   addButtonTitle: string;
   onClickAdd: () => void;
   onClickEdit: (value: string) => void;
-  onClickDelete: () => void;
+  onClickDelete: (id: string) => void;
   statusTrueText?: string;
   statusFalseText?: string;
   type: keyof T;

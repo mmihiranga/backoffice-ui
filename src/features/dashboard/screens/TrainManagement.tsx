@@ -130,7 +130,7 @@ const TrainManagement = () => {
     }
   };
 
-  const handleDelete = () => {
+  const handleDelete = (id: string) => {
     console.log("Delete");
   };
 

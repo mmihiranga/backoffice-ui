@@ -120,7 +120,7 @@ const TravelAgentManagement = () => {
     }
   };
 
-  const handleDelete = () => {
+  const handleDelete = (id: string) => {
     console.log("Delete");
   };
 

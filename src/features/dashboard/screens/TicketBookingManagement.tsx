@@ -124,8 +124,8 @@ const TicketBookingManagement = (props: Props) => {
     }
   };
 
-  const handleDelete = () => {
-    console.log("Delete");
+  const handleDelete = (id: string) => {
+    console.log("Delete", id);
   };
 
   const handleSubmit = async () => {

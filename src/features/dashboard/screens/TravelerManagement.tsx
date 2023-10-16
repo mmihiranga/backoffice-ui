@@ -118,17 +118,17 @@ const TravelerManagement = () => {
 
         // Create a mapping function to transform the response data
         const mapResponseToUser = (responseData: any) => {
-          return {
-            id: responseData.nic,
-            name: responseData.name,
-            email: responseData.username,
-            age: responseData.age,
-            address: responseData.address,
-            phoneNo: responseData.contactNo,
-            password: responseData.password,
-            isActive: responseData.isActive,
-            role: responseData.role,
-          };
+          return createData(
+            responseData.nic,
+            responseData.name,
+            responseData.username,
+            responseData.age,
+            responseData.address,
+            responseData.contactNo,
+            responseData.password,
+            responseData.isActive,
+            responseData.role
+          );
         };
 
         const userRows = users.map(mapResponseToUser);

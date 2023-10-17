@@ -1,9 +1,10 @@
 import { Box, Typography } from "@mui/material";
 import React, { useEffect } from "react";
 import DataTable, { HeadCell } from "../../../components/DataTable";
-import { useAppDispatch } from "../../../hooks";
+import { useAppDispatch, useAppSelector } from "../../../hooks";
 import { User } from "../../../types/user.types";
 import {
+  fetchUsers,
   setSelectedField,
   setShowUserModel,
   setUserType,
@@ -85,62 +86,16 @@ const TravelerManagement = () => {
   //     "Admin"
   //   ),
   // ];
-
-  function createData(
-    id: string,
-    name: string,
-    email: string,
-    age: string,
-    address: string,
-    phoneNo: string,
-    password: string,
-    isActive: boolean,
-    role: "Admin" | "Agent" | "Traveler"
-  ): User {
-    return {
-      id,
-      name,
-      email,
-      age,
-      address,
-      phoneNo,
-      password,
-      isActive,
-      role,
-    };
-  }
+  const { users } = useAppSelector((state) => state.user);
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await Api.get("/Users/getUsers");
-        const users = response.data;
-
-        // Create a mapping function to transform the response data
-        const mapResponseToUser = (responseData: any) => {
-          return createData(
-            responseData.nic,
-            responseData.name,
-            responseData.username,
-            responseData.age,
-            responseData.address,
-            responseData.contactNo,
-            responseData.password,
-            responseData.isActive,
-            responseData.role
-          );
-        };
-
-        const userRows = users.map(mapResponseToUser);
-
-        setRows(userRows);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    }
+    const fetchData = async () => {
+      await dispatch(fetchUsers());
+      setRows(users ?? []);
+    };
 
     fetchData();
-  }, []);
+  }, [dispatch, users]);
 
   const handleEdit = (value: string) => {
     const selectedUser = rows.find((user) => user.name === value);
@@ -157,6 +112,7 @@ const TravelerManagement = () => {
   const handleDelete = async (nic: string) => {
     try {
       const response = await Api.delete(`/Users/deleteUsers/${nic}`);
+      await dispatch(fetchUsers());
       console.log("User deleted successfully:", response.data);
     } catch (error) {
       console.error("Error deleting user:", error);

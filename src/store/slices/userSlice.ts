@@ -1,5 +1,6 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { IUserReduxState } from "../../types/user.types";
+import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { IUserReduxState, User } from "../../types/user.types";
+import Api from "../../services/Api";
 
 const initialState: IUserReduxState = {
   loading: false,
@@ -8,6 +9,33 @@ const initialState: IUserReduxState = {
   users: [],
   isShowUserModal: false,
 };
+
+export const fetchUsers = createAsyncThunk(
+  "user/fetchUsers",
+  async (_, { dispatch }) => {
+    try {
+      const response = await Api.get("/Users/getUsers");
+      const userRows = response.data.map((responseData: any) => {
+        return {
+          id: responseData.nic,
+          name: responseData.name,
+          email: responseData.username,
+          age: responseData.age,
+          address: responseData.address,
+          phoneNo: responseData.contactNo,
+          password: responseData.password,
+          isActive: responseData.isActive,
+          role: responseData.role,
+        };
+      });
+
+      dispatch(setUsers(userRows));
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+);
 
 export const userSlice = createSlice({
   name: "user",
@@ -28,10 +56,18 @@ export const userSlice = createSlice({
     setUserType: (state, action) => {
       state.userType = action.payload;
     },
+    setUsers: (state, action: PayloadAction<User[] | undefined>) => {
+      state.users = action.payload;
+    },
   },
 });
 
-export const { clearState, setSelectedField, setShowUserModel, setUserType } =
-  userSlice.actions;
+export const {
+  clearState,
+  setSelectedField,
+  setShowUserModel,
+  setUserType,
+  setUsers,
+} = userSlice.actions;
 
 export default userSlice.reducer;

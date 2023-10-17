@@ -12,6 +12,7 @@ import { useAppDispatch, useAppSelector } from "../../../hooks";
 import { orange } from "@mui/material/colors";
 import { Switch, Typography } from "@mui/joy";
 import {
+  fetchUsers,
   setSelectedField,
   setShowUserModel,
 } from "../../../store/slices/userSlice";
@@ -94,6 +95,7 @@ const UserModal = () => {
             isActive: selectedField.isActive,
           }
         );
+        await dispatch(fetchUsers());
         console.log("User updated successfully:", response.data);
       }
 
@@ -117,6 +119,7 @@ const UserModal = () => {
           address: selectedField.address,
           isActive: selectedField.isActive,
         });
+        await dispatch(fetchUsers());
         console.log("User Create successfully:", response.data);
       }
 
